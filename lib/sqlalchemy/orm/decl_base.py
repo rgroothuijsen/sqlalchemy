@@ -1308,7 +1308,7 @@ class _ClassScanMapperConfig(_MapperConfig):
             type(attr_value),
             required=False,
             is_dataclass_field=is_dataclass_field,
-            expect_mapped=expect_mapped and not is_dataclass,
+            expect_mapped=expect_mapped and not is_dataclass and not allow_unmapped,
         )
         if extracted is None:
             # ClassVar can come out here

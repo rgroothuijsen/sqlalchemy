@@ -65,7 +65,7 @@ from .interfaces import ORMColumnsClauseRole
 from .interfaces import ORMEntityColumnsClauseRole
 from .interfaces import ORMFromClauseRole
 from .path_registry import PathRegistry as PathRegistry
-from .. import event
+from .. import event, CompoundSelect
 from .. import exc as sa_exc
 from .. import inspection
 from .. import sql
@@ -1015,6 +1015,8 @@ class AliasedInsp(
         flat: bool = False,
         adapt_on_names: bool = False,
     ) -> Union[AliasedClass[_O], FromClause]:
+        if isinstance(element, CompoundSelect):
+            return element.alias(name=name, flat=flat)
         if isinstance(element, FromClause):
             if adapt_on_names:
                 raise sa_exc.ArgumentError(

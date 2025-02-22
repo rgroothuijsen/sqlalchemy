@@ -533,12 +533,23 @@ class _class_resolver:
                     assert isinstance(rval, (type, Table, _ModNS))
                 return rval
 
+    def has_omitted_schema(self):
+        return hasattr(self.cls, 'metadata') \
+        and hasattr(self.cls.metadata, 'schema') \
+        and isinstance(self.cls.metadata.schema, str) \
+        and isinstance(self.arg, str) \
+        and not re.match(".+[.].+", self.arg)
+
     def __call__(self) -> Any:
         if self.tables_only:
-            try:
-                return self._dict[self.arg]
-            except KeyError as k:
-                self._raise_for_name(self.arg, k)
+            if self.has_omitted_schema():
+                with_schema = f"{self.cls.metadata.schema}.{self.arg}"
+                return self._dict[with_schema]
+            else:
+                try:
+                    return self._dict[self.arg]
+                except KeyError as k:
+                    self._raise_for_name(self.arg, k)
         else:
             try:
                 x = eval(self.arg, globals(), self._dict)
